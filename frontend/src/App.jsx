@@ -19,7 +19,7 @@ function App() {
     }
     setIsLoading(true);
     try {
-      const res = await axios.get(`http://192.168.1.8:3001/prices/${encodeURIComponent(id)}`);
+      const res = await axios.get(`/prices/${encodeURIComponent(id)}`);
       setData(res.data);
     } catch (err) {
       console.error(err);

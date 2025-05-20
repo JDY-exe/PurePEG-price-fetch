@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const path = require('path');
 const app = express();
 const PORT = 3001;
 const getCID = require("./middleware/getCID");
@@ -26,10 +27,9 @@ const responseFormat = {
 
 app.use(cors()); // allow requests from your React frontend
 app.use(logger);
+app.use(express.static(path.join(__dirname, '../frontend/dist')));
 
-app.get("/", (req, res,) => {
-  res.status(200).send("Hello world");
-})
+
 // Sample price-scraping endpoint
 app.get('/prices/:id', getCID, getStoreLinks, filterVendorsByName, async (req, res) => {
   const vendors = req.vendors;
@@ -124,6 +124,10 @@ app.get('/prices/:id', getCID, getStoreLinks, filterVendorsByName, async (req, r
 
   console.log(responseArray);
   res.status(200).json(responseArray);
+});
+
+app.get('/{*any}', (req, res) => {
+  res.sendFile(path.join(__dirname, '../frontend/dist/index.html'));
 });
 
 const crawlVendor = async (crawlFunction, vendor) => {
@@ -260,7 +264,7 @@ const crawlBLD = async (page) => {
     });
   }
 
-  return data;  // ✅ This gets returned to your Node context
+  return data;
   });
   return products;
 }
@@ -277,6 +281,6 @@ function filterVendorsByName(req, res, next) {
 }
 
 
-app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`Server running on http://0.0.0.0:${PORT}`);
 });
