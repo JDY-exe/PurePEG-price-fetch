@@ -11,7 +11,8 @@ const vendorsToScrape = [
   "AA BLOCKS",
   "AbaChemScene",
   "Accela ChemBio Inc.",
-  "Combi-Blocks"
+  "Combi-Blocks",
+  "BroadPharm"
 ]
 
 const responseFormat = {
@@ -116,6 +117,34 @@ app.get('/prices/:id', getCID, getStoreLinks, filterVendorsByName, async (req, r
     responseArray.push(
       {
         "vendorName": "BLD",
+        "prices": "Company does not offer this product",
+        "notes": "error"
+      }
+    )
+  }
+  
+  const BroadPharm = vendors.find(vendor => vendor.SourceName === "BroadPharm");
+  if (BroadPharm) {
+    let vendorEntry = {
+        "vendorName": "BroadPharm",
+        "prices": "",
+        "notes": "array"
+      }
+    try {
+      let priceArray = await crawlVendor(crawlBroadPharm, BroadPharm);
+      vendorEntry.prices = priceArray;
+    }
+    catch (err) {
+      console.error(err);
+      vendorEntry.prices = err.toString();
+      vendorEntry.notes = "error";
+    }
+    responseArray.push(vendorEntry);
+  }
+  else {
+    responseArray.push(
+      {
+        "vendorName": "BroadPharm",
         "prices": "Company does not offer this product",
         "notes": "error"
       }
@@ -266,6 +295,38 @@ const crawlBLD = async (page) => {
 
   return data;
   });
+  return products;
+}
+
+const crawlBroadPharm = async (page) => {
+  try {
+    await page.waitForSelector('form.single-product ul');
+  }
+  catch (err) {
+    page.screenshot({path: "screenshot.png"});
+    throw err;
+  }
+  
+
+  const products = await page.evaluate(() => {
+    const productBlocks = document.querySelectorAll('form.single-product > ul > ul'); // each <ul> under the main one
+    const data = [];
+
+    productBlocks.forEach(block => {
+      const nameElem = block.querySelector('li.name');
+      const priceElem = block.querySelector('li.price');
+
+      if (nameElem && priceElem) {
+        const quantity = nameElem.textContent.trim();
+        const price = priceElem.textContent.trim();
+
+        data.push({ quantity, price });
+      }
+    });
+
+    return data;
+  });
+
   return products;
 }
 
