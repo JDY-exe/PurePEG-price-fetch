@@ -260,7 +260,7 @@ const crawlAccela = async (page) => {
 
 const crawlBLD = async (page) => {
   try {
-    await page.waitForSelector('.location_selt', { timeout: 5000 });
+    await page.waitForSelector('.location_selt', { timeout: 3000 });
 
     const popupVisible = await page.locator('.location_selt').isVisible();
     if (popupVisible) {
@@ -300,10 +300,9 @@ const crawlBLD = async (page) => {
 
 const crawlBroadPharm = async (page) => {
   try {
-    await page.waitForSelector('form.single-product ul');
+    await page.waitForSelector('form.single-product ul', { timeout: 5000 });
   }
   catch (err) {
-    page.screenshot({path: "screenshot.png"});
     throw err;
   }
   
