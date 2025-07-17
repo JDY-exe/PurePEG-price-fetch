@@ -361,5 +361,5 @@ async function crawlBroadPharm(page) {
 // =================================================================
 
 app.listen(PORT, () => {
-    console.log(`Server running on http://localhost:${PORT}`);
+    console.log(`Server running on 0.0.0.0:${PORT}`);
 });
