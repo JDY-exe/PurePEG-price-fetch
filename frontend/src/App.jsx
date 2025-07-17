@@ -19,8 +19,9 @@ function App() {
     }
     setIsLoading(true);
     try {
-      const res = await axios.get(`/prices/${encodeURIComponent(id)}`);
+      const res = await axios.get(`http://localhost:3001/prices/${encodeURIComponent(id)}`);
       setData(res.data);
+      console.log(res.data)
     } catch (err) {
       console.error(err);
 
@@ -66,7 +67,7 @@ function App() {
         <div className="text-sm font-medium text-red-400 mt-3 mb-1">
           {errorMessage}
         </div>
-        
+
 
         <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
           {data.map((company) => (
@@ -81,9 +82,19 @@ function App() {
 function Card({ company }) {
   return (
     <div className="bg-white border border-gray-200 shadow-sm rounded-lg p-4 space-y-2">
-      <h2 className="text-lg font-semibold text-gray-800">{company.vendorName}</h2>
+      {(company.status === "success" && company.data.url) ?
+        (<a
+          href={company.data.url}
+          target="_blank"
+          className="text-blue-600 hover:underline text-lg font-semibold"
+        >
+          {company.vendorName}
+        </a>) : 
+        (<h2 className="text-lg font-semibold text-gray-800">{company.vendorName}</h2>)
+      }
 
-      {company.notes === "array" && (
+
+      {company.status === "success" && (
         <table className="w-full text-sm border border-gray-300 rounded">
           <thead className="bg-gray-100 text-gray-700">
             <tr>
@@ -92,7 +103,7 @@ function Card({ company }) {
             </tr>
           </thead>
           <tbody>
-            {company.prices.map((item, i) => (
+            {company.data.prices.map((item, i) => (
               <tr key={i} className="even:bg-gray-50">
                 <td className="px-4 py-2 border-b text-gray-900 w-1/2">{item.quantity}</td>
                 <td className="px-4 py-2 border-b text-gray-900 w-1/2">{item.price}</td>
@@ -102,23 +113,19 @@ function Card({ company }) {
         </table>
       )}
 
-      {company.notes === "link" && (
-        company.prices ? (
-          <a
-            href={company.prices}
-            target="_blank"
-            className="text-blue-600 hover:underline break-all text-sm"
-          >
-            {company.prices}
-          </a>
-        ) : (
-          <div className="text-sm text-gray-500">Company does not offer product</div>
-        )
+      {company.status === "link_only" && (
+        <a
+          href={company.data.url}
+          target="_blank"
+          className="text-blue-600 hover:underline break-all text-sm"
+        >
+          {company.data.url}
+        </a>
       )}
 
       {company.notes === "error" && (
         <div className="text-sm text-red-600">
-          ERROR: {company.prices}
+          ERROR: {company.data.message}
         </div>
       )}
     </div>
