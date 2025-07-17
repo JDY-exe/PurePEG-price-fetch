@@ -123,7 +123,7 @@ function Card({ company }) {
         </a>
       )}
 
-      {company.notes === "error" && (
+      {(company.status === "error" || company.status === "not_found") && (
         <div className="text-sm text-red-600">
           ERROR: {company.data.message}
         </div>

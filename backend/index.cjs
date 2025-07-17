@@ -283,7 +283,7 @@ async function executeCrawl(crawlFunction, url) {
         return priceArray;
     } catch (err) {
         console.error(`Error crawling ${url}:`, err);
-        const screenshotPath = `error_screenshot_${new Date().toISOString().replace(/:/g, '-')}.png`;
+        const screenshotPath = `./debug_screenshot/error_screenshot_${new Date().toISOString().replace(/:/g, '-')}.png`;
         await page.screenshot({ path: screenshotPath });
         console.log(`Screenshot saved to ${screenshotPath}`);
         // Re-throw the error to be caught by the handler
