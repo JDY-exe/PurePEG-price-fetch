@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "install": "npm install --prefix backend && npm install --prefix frontend",
-    "build": "PLAYWRIGHT_BROWSERS_PATH=0 ./node_modules/.bin/playwright install --with-deps && npm run build --prefix frontend",
+    "build": "PLAYWRIGHT_BROWSERS_PATH=0 ./backend/node_modules/.bin/playwright install --with-deps && npm run build --prefix frontend",
     "start": "npm start --prefix backend"
   }
 }
