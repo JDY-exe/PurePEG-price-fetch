@@ -33,14 +33,17 @@ const wc_API = new WooCommerceRestApi.default({
   version: 'wc/v3'
 });
 
+const CACHE_FILE_PATH = "./meta/product_cache.json"
+
 // Load local product cache on startup
 let purePEGCache = [];
 try {
-    if (fs.existsSync('./meta/cache-array.json')) {
-        purePEGCache = JSON.parse(fs.readFileSync("./meta/cache-array.json"));
+    if (fs.existsSync(CACHE_FILE_PATH)) {
+        let purePEGCacheObject = JSON.parse(fs.readFileSync(CACHE_FILE_PATH));
+        purePEGCache = Object.values(purePEGCacheObject);
         console.log("Successfully loaded PurePEG product cache.");
     } else {
-        console.warn("Warning: Could not find PurePEG cache file at './meta/cache-array.json'.");
+        console.warn("Warning: Could not find PurePEG cache file at " + CACHE_FILE_PATH);
     }
 } catch (error) {
     console.error("Error loading or parsing PurePEG cache file:", error);
@@ -200,8 +203,9 @@ function formatResponse(vendorName, status, { prices = [], url = null, message =
  * Handles data retrieval for PurePEG via WooCommerce API.
  */
 async function handlePurePegApi({ searchTerm }) {
-    const product = purePEGCache.find(p =>
-        p.itemName === searchTerm || p.cas === searchTerm || p.smiles === searchTerm
+    
+    const product = purePEGCache.find(p => 
+        p.name == searchTerm || p.attributes["CAS Number"] == searchTerm || p.attributes.SMILES == searchTerm
     );
 
     if (!product) {
@@ -209,7 +213,7 @@ async function handlePurePegApi({ searchTerm }) {
     }
 
     try {
-        const response = await wc_API.get(`products/${product.productId}/variations`);
+        const response = await wc_API.get(`products/${product.parentId}/variations`);
         const prices = response.data.map(variation => ({
             quantity: variation.weight,
             price: variation.regular_price
